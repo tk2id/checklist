@@ -15,7 +15,18 @@
       overflow-wrap: break-word;
     }
     h1 {
-      margin-bottom: 30px;
+      margin-bottom: 20px;
+    }
+    .input-name {
+      margin-bottom: 20px;
+    }
+    .input-name input {
+      font-size: 18px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 80%;
+      max-width: 300px;
     }
     .btn {
       padding: 15px 30px;
@@ -42,16 +53,32 @@
       word-wrap: break-word;
       overflow-wrap: break-word;
     }
-    .checklist div, .result pre {
+    .checklist div {
+      font-size: 18px;
+      margin: 15px 0;
+      line-height: 1.6;
+      display: flex;
+      align-items: flex-start;
+    }
+    .checklist label {
+      display: flex;
+      align-items: flex-start;
+    }
+    .checklist input[type="checkbox"] {
+      transform: scale(1.5);
+      margin-right: 12px;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+    .checklist span {
+      flex: 1;
+    }
+    .result pre {
       font-size: 18px;
       margin: 15px 0;
       line-height: 1.6;
       font-family: 'Segoe UI', sans-serif;
       white-space: pre-wrap;
-    }
-    .checklist input[type="checkbox"] {
-      transform: scale(1.5);
-      margin-right: 12px;
     }
     .hidden {
       display: none;
@@ -93,6 +120,9 @@
 <body>
   <h1>신입 교사 동행 체크리스트</h1>
   <div id="main-menu">
+    <div class="input-name">
+      <input type="text" id="teacherName" placeholder="선생님 이름을 입력하세요" />
+    </div>
     <button class="btn" onclick="startChecklist('rental')">대여 동행 체크리스트</button>
     <button class="btn" onclick="startChecklist('lesson')">수업 동행 체크리스트</button>
   </div>
@@ -147,7 +177,7 @@
 
       checklists[type].forEach((item, index) => {
         const div = document.createElement('div');
-        div.innerHTML = `<label><input type="checkbox" id="item${index}" /> ${index + 1}. ${item.text}</label>`;
+        div.innerHTML = `<label><input type="checkbox" id="item${index}" /><span>${index + 1}. ${item.text}</span></label>`;
         container.appendChild(div);
       });
 
@@ -161,6 +191,7 @@
 
     function showResult(type) {
       const checklist = checklists[type];
+      const name = document.getElementById('teacherName').value.trim() || '해당';
       let checkedCount = 0;
       let feedbacks = [];
 
@@ -177,13 +208,13 @@
       else rating = '매우 부족';
 
       const ratingClass = getRatingClass(checkedCount);
-      const resultText = `결과: ${rating} (${checkedCount}/12)`;
+      const resultText = `${name} 선생님의 결과: ${rating} (${checkedCount}/12)`;
       const feedbackText = feedbacks.join('\n');
 
       const resultContainer = document.getElementById('result-container');
       resultContainer.innerHTML = `
         <div class="feedback">
-          <div class="rating-box ${ratingClass}">${rating} (${checkedCount}/12)</div>
+          <div class="rating-box ${ratingClass}">${name} 선생님의 결과: ${rating} (${checkedCount}/12)</div>
           <h3>피드백</h3>
           <pre id="feedback-text">${resultText}\n\n${feedbackText}</pre>
           <button class="btn" onclick="copyFeedback()">복사하기</button>
