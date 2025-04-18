@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>신입 교사 동행 체크리스트</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    h1 {
+      margin-bottom: 30px;
+    }
+    .btn {
+      padding: 15px 30px;
+      margin: 10px auto;
+      display: block;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      background-color: #4facfe;
+      color: white;
+      cursor: pointer;
+      width: 80%;
+      max-width: 300px;
+    }
+    .checklist, .result {
+      max-width: 90%;
+      width: 600px;
+      margin: 0 auto;
+      text-align: left;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    .checklist div, .result pre {
+      font-size: 18px;
+      margin: 15px 0;
+      line-height: 1.6;
+      font-family: 'Segoe UI', sans-serif;
+      white-space: pre-wrap;
+    }
+    .checklist input[type="checkbox"] {
+      transform: scale(1.5);
+      margin-right: 12px;
+    }
+    .hidden {
+      display: none;
+    }
+    .feedback {
+      margin-top: 20px;
+      text-align: center;
+    }
+    button.action {
+      margin-top: 20px;
+      background-color: #00c896;
+    }
+    .rating-box {
+      font-size: 26px;
+      font-weight: bold;
+      padding: 14px 20px;
+      border-radius: 8px;
+      display: inline-block;
+      margin-bottom: 20px;
+      text-align: center;
+      word-break: keep-all;
+    }
+    .excellent { background-color: #a0e7e5; color: #004d40; }
+    .good { background-color: #b2f2bb; color: #1b5e20; }
+    .average { background-color: #fff3cd; color: #856404; }
+    .poor { background-color: #ffe0b2; color: #e65100; }
+    .very-poor { background-color: #ffcdd2; color: #b71c1c; }
+    @media (max-width: 600px) {
+      .btn {
+        width: 100%;
+        font-size: 16px;
+      }
+      .checklist div, .result pre {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>신입 교사 동행 체크리스트</h1>
+  <div id="main-menu">
+    <button class="btn" onclick="startChecklist('rental')">대여 동행 체크리스트</button>
+    <button class="btn" onclick="startChecklist('lesson')">수업 동행 체크리스트</button>
+  </div>
+
+  <div id="checklist-container" class="checklist hidden"></div>
+  <div id="result-container" class="result hidden"></div>
+
+  <script>
+    const checklists = {
+      rental: [
+        { text: "북친구 책읽기습관 셀프형의 구성과 특징을 적절히 설명하였는가?", feedback: "프로그램 소개에 대한 설명을 보완해 주세요." },
+        { text: "배본 전 스케줄 생성 및 회수 후 스케줄 입력을 올바르게 진행하였는가?", feedback: "전산 업무 처리 과정에서 누락이 있었던 부분을 점검해 주세요." },
+        { text: "배본 전 도서 및 가방 내/외부의 훼손 여부와 청결을 점검하였는가?", feedback: "도서 가방의 점검이 필요합니다." },
+        { text: "가방 교환에 내한 안내 문자(SMS, 카카오톡 등)를 발송하였는가?", feedback: "안내 문자 발송 여부를 다시 확인해 주세요." },
+        { text: "현장 방문 시 복장 및 용모가 적절한가?", feedback: "복장과 용모가 현장에 적합한지 점검해 주세요." },
+        { text: "고객에게 자연스럽고 예의 바른 태도로 응대하였는가?", feedback: "고객 응대 태도에 조금 더 주의가 필요합니다." },
+        { text: "회수 누락 시 대응법(안내, 스케줄 조정 등)을 숙지했는가?", feedback: "미회수 상황에 대한 대응법 숙지가 필요합니다." },
+        { text: "회수 후 도서 및 가방 내/외부의 훼손 여부와 청결을 점검하고 올바르게 수납하였는가?", feedback: "가방 정리정돈에 미흡한 부분이 있었습니다." },
+        { text: "부가서비스(리딩가이드, 독서이력관리 등) 및 회원 관리 문자를 발송하였는가?", feedback: "부가서비스 제공 여부를 점검해 주세요." },
+        { text: "전반적인 프로세스(스케줄 생성-회수-배본-스케줄 입력)를 이해하고 있는가?", feedback: "프로세스 전반에 대한 이해도가 필요합니다." },
+        { text: "현장에서 특이사항 또는 궁금한 점을 스스로 질문하거나 메모하였는가?", feedback: "현장 메모 또는 질문이 부족했습니다." },
+        { text: "전 과정에서 성실하고 적극적인 태도를 보이며, 피드백에 열린 자세로 임하였는가?", feedback: "전반적인 태도에서 보완이 필요합니다." }
+      ],
+      lesson: [
+        { text: "북친구 책읽기습관 코칭형의 구성과 특징을 적절히 설명하였는가?", feedback: "프로그램 소개에 대한 설명을 보완해 주세요." },
+        { text: "도서 가방, 교재, 활동 자료 등 수업 준비를 철저히 하였는가?", feedback: "도서 가방과 활동 자료 준비가 미흡했습니다." },
+        { text: "목소리 톤, 속도, 리듬, 표정 등이 자연스러우며, 회원에게 재미를 주었는가?", feedback: "동화구연에 개선이 필요합니다." },
+        { text: "책 내용을 기반으로 다양한 유형의 발문을 활용하였는가?", feedback: "발문 활용의 다양성이 부족했습니다." },
+        { text: "회원의 반응을 이끌고, 적절한 리액션을 주고받았는가?", feedback: "상호작용이 원활하지 않았습니다." },
+        { text: "긍정적이고 배려 있는 언어를 사용하였는가?", feedback: "수업 언어 표현에서 개선이 필요합니다." },
+        { text: "독후활동을 효과적으로 운영하고, 회원이 집중하도록 유도하였는가?", feedback: "독후활동 운영에 보완이 필요합니다." },
+        { text: "회원이 산만하거나 흐름이 끊길 때 적절히 대처하였는가?", feedback: "돌발 상황 대처가 부족했습니다." },
+        { text: "수업 내용과 회원의 반응을 명확히 전달하며, 응대 시 자신감, 공손함, 진정성이 있었는가?", feedback: "고객 상담 응대에서 부족한 점이 있었습니다." },
+        { text: "전반적인 프로세스(수업 전-친밀감 형성-책읽기 전/중/후-수업 후)를 이해하고 있는가?", feedback: "수업 전체 흐름에 대한 이해도가 부족했습니다." },
+        { text: "현장에서 특이사항 또는 궁금한 점을 스스로 질문하거나 메모하였는가?", feedback: "질문 또는 메모가 부족했습니다." },
+        { text: "전 과정에서 성실하고 적극적인 태도를 보이며, 피드백에 열린 자세로 임하였는가?", feedback: "전반적인 태도에서 개선이 필요합니다." }
+      ]
+    };
+
+    function getRatingClass(score) {
+      if (score >= 11) return 'excellent';
+      if (score >= 9) return 'good';
+      if (score >= 6) return 'average';
+      if (score >= 3) return 'poor';
+      return 'very-poor';
+    }
+
+    function startChecklist(type) {
+      document.getElementById('main-menu').classList.add('hidden');
+      const container = document.getElementById('checklist-container');
+      container.innerHTML = '';
+
+      checklists[type].forEach((item, index) => {
+        const div = document.createElement('div');
+        div.innerHTML = `<label><input type="checkbox" id="item${index}" /> ${index + 1}. ${item.text}</label>`;
+        container.appendChild(div);
+      });
+
+      const button = document.createElement('button');
+      button.className = 'btn action';
+      button.innerText = '동행 완료';
+      button.onclick = () => showResult(type);
+      container.appendChild(button);
+      container.classList.remove('hidden');
+    }
+
+    function showResult(type) {
+      const checklist = checklists[type];
+      let checkedCount = 0;
+      let feedbacks = [];
+
+      checklist.forEach((item, index) => {
+        if (document.getElementById(`item${index}`).checked) checkedCount++;
+        else feedbacks.push(`- ${item.feedback}`);
+      });
+
+      let rating = '';
+      if (checkedCount >= 11) rating = '매우 우수';
+      else if (checkedCount >= 9) rating = '우수';
+      else if (checkedCount >= 6) rating = '보통';
+      else if (checkedCount >= 3) rating = '부족';
+      else rating = '매우 부족';
+
+      const ratingClass = getRatingClass(checkedCount);
+      const resultText = `결과: ${rating} (${checkedCount}/12)`;
+      const feedbackText = feedbacks.join('\n');
+
+      const resultContainer = document.getElementById('result-container');
+      resultContainer.innerHTML = `
+        <div class="feedback">
+          <div class="rating-box ${ratingClass}">${rating} (${checkedCount}/12)</div>
+          <h3>피드백</h3>
+          <pre id="feedback-text">${resultText}\n\n${feedbackText}</pre>
+          <button class="btn" onclick="copyFeedback()">복사하기</button>
+          <button class="btn" onclick="location.reload()">돌아가기</button>
+        </div>
+      `;
+
+      document.getElementById('checklist-container').classList.add('hidden');
+      resultContainer.classList.remove('hidden');
+    }
+
+    function copyFeedback() {
+      const text = document.getElementById('feedback-text').innerText;
+      navigator.clipboard.writeText(text);
+      alert('결과와 피드백이 복사되었습니다.');
+    }
+  </script>
+</body>
+</html>
